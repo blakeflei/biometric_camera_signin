@@ -21,13 +21,13 @@ Dependencies
 
 User Installation
 ~~~~~~~~~~~~~~~~~
-First install `OpenCV <https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html>`, `sqlcipher <https://www.zetetic.net/sqlcipher/introduction/>`, and pip install python dependencies.
+First install `OpenCV <https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html>`__, `sqlcipher <https://www.zetetic.net/sqlcipher/introduction/>`__, and pip install python dependencies.
 
 References
 ~~~~~~~~~~
-- `https://opencv.org/ <https://opencv.org/>`
-- `https://www.pyimagesearch.com/ <https://www.pyimagesearch.com/>`
-- `https://scikit-learn.org/stable/index.html <https://scikit-learn.org/stable/index.html>`
+- `https://opencv.org/ <https://opencv.org/>`__
+- `https://www.pyimagesearch.com/ <https://www.pyimagesearch.com/>`__
+- `https://scikit-learn.org/stable/index.html <https://scikit-learn.org/stable/index.html>`__
 
 License
 ~~~~~~~
