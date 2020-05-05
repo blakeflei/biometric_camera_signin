@@ -8,9 +8,9 @@ from imutils import paths
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import SVC
-import numpy as np
-import imutils
 import cv2
+import imutils
+import numpy as np
 
 fn_config = 'biometric.cfg'
 

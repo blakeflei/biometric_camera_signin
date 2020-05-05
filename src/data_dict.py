@@ -4,7 +4,6 @@
 import json
 import configparser
 
-
 fn_config = 'biometric.cfg'
 
 config = configparser.ConfigParser()

@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 
+from tkinter import filedialog
+from tkinter import simpledialog
 import configparser
 import copy
 import datetime
@@ -10,21 +12,19 @@ import re
 import shutil
 import textwrap
 import time
+import tkinter as tk
 import uuid
 
 from PIL import ImageTk
 from tkcalendar import DateEntry
-from tkinter import simpledialog
-from tkinter import filedialog
-import pickle
 import pandas as pd
-import tkinter as tk
+import pickle
 
 from camera import FacialCamera as FC
-from embeddings_train import ModelTrain as mt
-import database
 from database import SignLog
 from database import SignSS
+from embeddings_train import ModelTrain as mt
+import database
 
 # Basic variables
 fn_config = 'biometric.cfg'
