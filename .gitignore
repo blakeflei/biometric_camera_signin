@@ -1,0 +1,5 @@
+*.cfg
+*.sqlite
+models/
+data/
+meal_logs/
