@@ -17,29 +17,40 @@ Installation
 Instructions assume a default 'pi' user and sources cloned into the home directory:
 
 - Install Docker:
-  ``curl -sSL https://get.docker.com | sh``
-  More info is available `here <https://www.raspberrypi.org/blog/docker-comes-to-raspberry-pi/>`__.
+    ``curl -sSL https://get.docker.com | sh``
+
+    More info is available `here <https://www.raspberrypi.org/blog/docker-comes-to-raspberry-pi/>`__.
 
 - Clone the repo to the home directory with the commands::
-  cd /home/pi
-  git clone https://github.com/blakeflei/biometric_camera_signin.git  
+
+    cd /home/pi
+
+    git clone https://github.com/blakeflei/biometric_camera_signin.git
 
 - Create default configuration and download pretrained models::
-  docker run \
-      --rm \
-      -v /home/pi/biometric_camera_signin:/home/biom/biometric_camera_signin  \
-      -w /home/biom/biometric_camera_signin \
-      blakeflei/arm32v7-biometric:20200508 \
-      bash biometric_setup.sh
+
+    docker run \
+          --rm \
+          -v /home/pi/biometric_camera_signin:/home/biom/biometric_camera_signin  \
+          -w /home/biom/biometric_camera_signin \
+          blakeflei/arm32v7-biometric:20200508 \
+          bash biometric_setup.sh
 
 - Start sign in app::
-  cd /home/pi/biometric_cameeera_signin
-  bash start.sh
 
+    cd /home/pi/biometric_cameeera_signin
+
+    bash start.sh
+
+
+### Building the docker image:
+While the dockerfile is available of building in the ``docker`` folder, arm32 libraries for python and opencv-4.3.0 aren't available via pip or buster repos, so the build process requires compilation and takes several hours.
+
+A `docker image is available on docker hub <https://hub.docker.com/r/blakeflei/arm32v7-biometric>`__ and is recommended for use.
 
 Dependencies
 ~~~~~~~~~~~~
-While the python code is platform indpendent, the docker image presumes arm32 architecture.
+While the python code is platform independent, the docker image presumes arm32 architecture.
 
 
 References
