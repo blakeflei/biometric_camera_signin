@@ -43,7 +43,7 @@ Instructions assume a default 'pi' user and sources cloned into the home directo
     bash start.sh
 
 
-### Building the docker image:
+Building the docker image:
 While the dockerfile is available of building in the ``docker`` folder, arm32 libraries for python and opencv-4.3.0 aren't available via pip or buster repos, so the build process requires compilation and takes several hours.
 
 A `docker image is available on docker hub <https://hub.docker.com/r/blakeflei/arm32v7-biometric>`__ and is recommended for use.
