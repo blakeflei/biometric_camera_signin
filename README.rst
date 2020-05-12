@@ -6,11 +6,11 @@ An Python3 application to facilitate biometric sign in via an edge device with a
 
 This project came about from conversations with the Atlanta-based non-profit `SafeHouse Outreach <https://www.safehouseoutreach.org>`__, dedicated to `breaking the cycle of poverty <https://www.safehouseoutreach.org/about-us/>`__, which is apparent on just about any walk through downtown (Peachtree Center) Atlanta.
 
-Part of the service that SafeHouse provides is a meal several times a week, and each time a list attendees is required by the Georgia Department of Community Affairs `Homeless Management Information System (HMIS) <https://www.dca.ga.gov/safe-affordable-housing/homeless-special-needs-housing/homeless-management-information-system-hmis>`__. There are many repeat guests (i.e. an individual living on the streets) who attend, so together with SafeHouse, a biometric sign in system that recognized guests and output a log of who attended a meal service (i.e. a meal log) was settled upon as a solution. 
+One service SafeHouse provides is a meal several times a week, and each time a list of guests (i.e.  individuals living on the streets) is required by the Georgia Department of Community Affairs `Homeless Management Information System (HMIS) <https://www.dca.ga.gov/safe-affordable-housing/homeless-special-needs-housing/homeless-management-information-system-hmis>`__. There are many repeat guests so in collaboration with SafeHouse, a biometric sign in device that could output list of guests (i.e. a meal log) was settled upon as a solution. 
 
-A `Raspberry Pi 4 <https://www.raspberrypi.org/products/raspberry-pi-4-model-b/>`__ + `camera <https://www.raspberrypi.org/products/camera-module-v2/>`__ was used to develop, but future iterations could leverage more powerful hardware like a `NVIDIA Jetson Nano <https://developer.nvidia.com/embedded/jetson-nano-developer-kit>`__.
+A `Raspberry Pi 4 <https://www.raspberrypi.org/products/raspberry-pi-4-model-b/>`__ + `camera <https://www.raspberrypi.org/products/camera-module-v2/>`__ was used for development, but future iterations could leverage more powerful hardware like a `NVIDIA Jetson Nano <https://developer.nvidia.com/embedded/jetson-nano-developer-kit>`__.
 
-Special thanks to SafeHouse for working with us!
+Special thanks to SafeHouse for their support!
 
 Installation
 ------------
@@ -44,7 +44,7 @@ Instructions assume a default 'pi' user and sources cloned into the home directo
 
 
 Building the docker image:
-While the dockerfile is available of building in the ``docker`` folder, arm32 libraries for python and opencv-4.3.0 aren't available via pip or debian buster repos, so the build process requires compilation and takes several hours.
+While the dockerfile is available for building in the ``docker`` folder, arm32 libraries for python and opencv-4.3.0 aren't available via pip or debian buster repos, so the build process requires compilation and takes several hours.
 
 A `docker image is available on docker hub <https://hub.docker.com/r/blakeflei/arm32v7-biometric>`__ and is recommended for use.
 
