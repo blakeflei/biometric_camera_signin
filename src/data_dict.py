@@ -1,8 +1,9 @@
 # Script to save the hmis FY 2020 v1.7 to a json file 
 # for reference in the database and output
 
-import json
+from pathlib import Path
 import configparser
+import json
 
 fn_config = 'biometric.cfg'
 
@@ -79,5 +80,10 @@ data_dict = {'hmis_version': 'hmis fy2020 1.7',
                                 9: 'Client refused',
                                 99: 'Data not collected'}}}
 
+# Create directory if missing
+pn_datadict = Path(fn_datadict).parents[0]
+Path(pn_datadict).mkdir(parents=True, exist_ok=True)
+
+# Save datadict
 with open(fn_datadict, 'w') as f:
     json.dump(data_dict, f)

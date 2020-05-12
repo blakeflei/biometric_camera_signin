@@ -5,7 +5,7 @@ import os
 
 config = configparser.ConfigParser()
 
-biometric_dir = '/home/pi/BioMetric/'
+biometric_dir = '/home/biom/biometric_camera_signin/'
 
 # Init config
 config['DEFAULT'] = {}

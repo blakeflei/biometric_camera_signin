@@ -4,24 +4,43 @@ BioMetric Camera Sign-In
 
 An Python3 application to facilitate biometric sign in via an edge device with a camera. Developed on a Raspberry Pi 4.
 
+This project came about from conversations with the Atlanta-based non-profit `SafeHouse Outreach <https://www.safehouseoutreach.org>`__, dedicated to `breaking the cycle of poverty <https://www.safehouseoutreach.org/about-us/>`__, which is apparent on just about any walk through downtown (Peachtree Center) Atlanta.
+
+Part of the service that SafeHouse provides is a meal several times a week, and each time a list attendees is required by the Georgia Department of Community Affairs `Homeless Management Information System (HMIS) <https://www.dca.ga.gov/safe-affordable-housing/homeless-special-needs-housing/homeless-management-information-system-hmis>`__. There are many repeat guests (i.e. an individual living on the streets) who attend, so together with SafeHouse, a biometric sign in system that recognized guests and output a log of who attended a meal service (i.e. a meal log) was settled upon as a solution. 
+
+A `Raspberry Pi 4 <https://www.raspberrypi.org/products/raspberry-pi-4-model-b/>`__ + `camera <https://www.raspberrypi.org/products/camera-module-v2/>`__ was used to develop, but future iterations could leverage more powerful hardware like a `NVIDIA Jetson Nano <https://developer.nvidia.com/embedded/jetson-nano-developer-kit>`__.
+
+Special thanks to SafeHouse for working with us!
+
 Installation
 ------------
+Instructions assume a default 'pi' user and sources cloned into the home directory:
+
+- Install Docker:
+  ``curl -sSL https://get.docker.com | sh``
+  More info is available `here <https://www.raspberrypi.org/blog/docker-comes-to-raspberry-pi/>`__.
+
+- Clone the repo to the home directory with the commands::
+  cd /home/pi
+  git clone https://github.com/blakeflei/biometric_camera_signin.git  
+
+- Create default configuration and download pretrained models::
+  docker run \
+      --rm \
+      -v /home/pi/biometric_camera_signin:/home/biom/biometric_camera_signin  \
+      -w /home/biom/biometric_camera_signin \
+      blakeflei/arm32v7-biometric:20200508 \
+      bash biometric_setup.sh
+
+- Start sign in app::
+  cd /home/pi/biometric_cameeera_signin
+  bash start.sh
+
 
 Dependencies
 ~~~~~~~~~~~~
+While the python code is platform indpendent, the docker image presumes arm32 architecture.
 
-- OpenCV >= 4.2.0
-- Python >= 3.7.3
-- SQLAlchemy >= 1.3.16
-- imutils >= 0.5.3
-- pandas >= 1.0.3
-- pillow >= 7.0.0
-- pysqlcipher3 >= 1.0.3
-- scikit-learn >= 0.22.1
-
-User Installation
-~~~~~~~~~~~~~~~~~
-First install `OpenCV <https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html>`__, `sqlcipher <https://www.zetetic.net/sqlcipher/introduction/>`__, and pip install python dependencies.
 
 References
 ~~~~~~~~~~
