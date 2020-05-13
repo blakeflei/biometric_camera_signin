@@ -87,6 +87,21 @@ class Application:
             print('[INFO] No prior {} database found, re-initializing.'
                   .format(fn_guestdb))
             self.guestdb.create_db_tables()
+            # Create unknown entry and folder:
+            os.makedirs(os.path.join(self.pn_guest_images,
+                                     '00000000-0000-0000-0000-000000000000'),
+                        exist_ok=True)
+            unknown_guest = {'first_name':'Unknown',
+                             'middle_name':'Unknown',
+                             'last_name':'Unknown',
+                             'dob':'01/01/1900',
+                             'race':'Guest refused',
+                             'ethnicity':'Guest refused',
+                             'gender':'Guest refused',
+                             'fr_id':'00000000-0000-0000-0000-000000000000'}
+            guest_meta = database.hmisv17_newguestdiag(unknown_guest,
+                                             self.datadict_menu_rev)
+            self.guestdb.add_guest(guest_meta)
 
         # GUI Window initialization
         self.root = tk.Tk()  # initialize root window
@@ -94,6 +109,19 @@ class Application:
 
         # self.destructor function gets fired when the window is closed
         self.root.protocol('WM_DELETE_WINDOW', self.destructor)
+
+        # Check for faces in unknown folder
+        if len(glob.glob(os.path.join(self.pn_guest_images,
+                                     '00000000-0000-0000-0000-000000000000',
+                                     '*.png'))) < 1:
+            tk.messagebox.showwarning(
+                "No Unknown Images",
+                "No unknown images located in\n"
+                "{}\n"
+                "Please add images of non-guest faces there."
+                .format(os.path.join(self.pn_guest_images,
+                                     '00000000-0000-0000-0000-000000000000')),
+                parent=self.root)
 
         # Set up GUI canvas and panel
         self.panel = tk.Label(self.root)  # initialize image panel
