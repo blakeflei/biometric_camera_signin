@@ -8,6 +8,7 @@ import datetime
 import glob
 import json
 import os
+import pickle
 import re
 import shutil
 import textwrap
@@ -18,7 +19,6 @@ import uuid
 from PIL import ImageTk
 from tkcalendar import DateEntry
 import pandas as pd
-import pickle
 
 from camera import FacialCamera as FC
 from database import SignLog
