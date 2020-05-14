@@ -8,6 +8,7 @@
 docker run \
 	--rm \
 	--env DISPLAY=:0.0 \
+	--env TZ=$(cat /etc/timezone) \
 	--volume /tmp/.X11-unix:/tmp/.X11-unix:ro \
 	--volume ${HOME}/.Xauthority:/hom/biom/.Xauthority:ro \
 	--volume /home/pi/biometric_camera_signin:/home/biom/biometric_camera_signin \
