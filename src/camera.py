@@ -248,7 +248,7 @@ class FacialCamera:
                 #print(curr_confidence,  # Keep for optimizing the detect/recog %
                 #      prob,
                 #      self.determine_guest_info(self.known_guest_meta,
-                                                guest_id))
+                #                                guest_id))
                 if prob >= self.min_recog_prob:
                     # Store guest_id info as dict of {guest_id:prob}
                     self.guest_ids[guest_id] = round(prob, 4)
