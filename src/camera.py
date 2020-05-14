@@ -121,7 +121,11 @@ class FacialCamera:
                                                                  pic_width,
                                                                  pic_height])
                 (x_start, y_start, x_end, y_end) = bound_box.astype("int")
-
+                # Only detect faces fully in the frame
+                if x_start < 0 or y_start < 0:
+                    continue
+                if x_end > self.image_width or y_end > self.image_width:
+                    continue
                 # Draw face bounding box
                 cv2.rectangle(pic_display,
                               (x_start, y_start),
@@ -210,6 +214,11 @@ class FacialCamera:
                 (face_height, face_width) = face.shape[:2]
                 if face_height < self.min_face_px[0] \
                    or face_width < self.min_face_px[1]:
+                    continue
+                # Only detect faces fully in the frame
+                if x_start < 0 or y_start < 0:
+                    continue
+                if x_end > self.image_width or y_end > self.image_width:
                     continue
 
                 # Create OpenCV blob for face region of interest
