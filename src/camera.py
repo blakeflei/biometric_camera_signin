@@ -249,14 +249,14 @@ class FacialCamera:
                     cv2.rectangle(pic_display,
                                   (x_start, y_start),
                                   (x_end, y_end),
-                                  (0, 0, 255),
+                                  (17, 190, 252),
                                   2)
                     cv2.putText(pic_display,
                                 text,
                                 (x_start, y),
                                 cv2.FONT_HERSHEY_SIMPLEX,
                                 0.45,
-                                (0, 0, 255),
+                                (17, 190, 252),
                                 2)
         return pic_display  # Show the output frame
 
