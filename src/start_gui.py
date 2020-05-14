@@ -111,9 +111,14 @@ class Application:
         self.root.protocol('WM_DELETE_WINDOW', self.destructor)
 
         # Check for faces in unknown folder
-        if len(glob.glob(os.path.join(self.pn_guest_images,
-                                     '00000000-0000-0000-0000-000000000000',
-                                     '*.png'))) < 1:
+        file_exts = ['*.png', '*.jpg', '*.jpeg']
+        fns_unknown_guest = []
+        for curr_file_ext in file_exts:
+            fns_unknown_guest.extend(
+                glob.glob(os.path.join(self.pn_guest_images,
+                                       '00000000-0000-0000-0000-000000000000',
+                                       curr_file_ext)))
+        if not fns_unknown_guest:
             tk.messagebox.showwarning(
                 "No Unknown Images",
                 "No unknown images located in\n"
