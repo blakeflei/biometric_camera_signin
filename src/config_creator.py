@@ -24,9 +24,9 @@ config['DEFAULT']['image_width'] = '600'
 # Display db clients table row entry when recognized
 config['DEFAULT']['display_name'] = 'first_name'
 # How sure are we that a face is present?
-config['DEFAULT']['min_detec_conf'] = '0.95'
+config['DEFAULT']['min_detec_conf'] = '0.50'
 # How sure are we that a particular name is that face?
-config['DEFAULT']['min_recog_prob'] = '0.85'
+config['DEFAULT']['min_recog_prob'] = '0.70'
 config['DEFAULT']['min_face_px'] = '(20, 20)'
 
 # Path and filenames:
