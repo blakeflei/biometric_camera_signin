@@ -76,11 +76,30 @@ class Application:
         self.guest_ids = {}
         self.signin_startstop = {'start_time': None, 'stop_time': None}
 
-        # Initialize DB
+        # Initialize DB, collect password if not specified
         fn_guestdb = config['DEFAULT']['fn_guestdb']
-        pw_guestdb = config['DEFAULT']['pw_guestdb']
-        self.guestdb = database.db(password=pw_guestdb,
-                                   dbname=fn_guestdb)
+
+        if 'pw_guestdb' in config['DEFAULT']:
+            pw_guestdb = config['DEFAULT']['pw_guestdb']
+        else:
+            for pw_attempt in range(1, 8):
+                tk.Tk().withdraw()
+                pw_guestdb = tk.simpledialog.askstring("Password",
+                                                       "Please enter password "
+                                                       "(attempt {}/8):".format(pw_attempt),
+                                                       show='*')
+
+                self.guestdb = database.db(password=pw_guestdb,
+                                           dbname=fn_guestdb)
+
+                if self.guestdb.test_db_connection():
+                    break
+                pw_attempt += 1
+
+        if not self.guestdb.test_db_connection():
+            tk.Tk().withdraw()
+            tk.messagebox.showinfo(title="Incorrect Password", message="Incorrect password, closing.")
+            exit(1)
 
         # Create db if it doesn't exist:
         if not os.path.isfile(fn_guestdb):

@@ -11,6 +11,7 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import create_engine
 from sqlalchemy import func
+from sqlalchemy.exc import DatabaseError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -174,6 +175,13 @@ class db:
 
         with open(fn_datadict) as f:
             self.datadict = json.load(f)
+
+    def test_db_connection(self):
+        try:
+            self.db_engine.table_names()
+            return True
+        except DatabaseError:
+            return False
 
     def create_db_tables(self):
         try:
