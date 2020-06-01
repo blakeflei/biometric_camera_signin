@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from pathlib import Path
 from tkinter import filedialog
 from tkinter import simpledialog
 import configparser
@@ -81,6 +82,7 @@ class Application:
         self.root.withdraw()
 
         # Initialize DB, collect password if not specified
+        clear_db_history()
         fn_guestdb = config['DEFAULT']['fn_guestdb']
 
         if 'pw_guestdb' in config['DEFAULT']:
@@ -440,6 +442,7 @@ class Application:
     def destructor(self):
         """ Destroy the root object and release all resources """
         print("[INFO] closing...")
+        clear_db_history()
         self.root.destroy()
         fc.destructor()
 
@@ -784,6 +787,15 @@ class ExportMealLogDialog(simpledialog.Dialog):
         print('[INFO] Exporting meal log to {}.'.format(result['file_path']))
         df_meal_log.to_csv(result['file_path'], index=False)
         return 1
+
+
+def clear_db_history():
+    """Clear database history (secure pw and user info)"""
+    filename = str(Path.joinpath(Path.home(), '.sqlite_history'))
+    try:
+        os.remove(filename)
+    except OSError:
+        pass
 
 
 if __name__ == "__main__":
