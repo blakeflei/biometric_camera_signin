@@ -76,30 +76,50 @@ class Application:
         self.guest_ids = {}
         self.signin_startstop = {'start_time': None, 'stop_time': None}
 
+        # GUI Window initialization
+        self.root = tk.Tk()  # initialize root window
+        self.root.withdraw()
+
         # Initialize DB, collect password if not specified
         fn_guestdb = config['DEFAULT']['fn_guestdb']
 
         if 'pw_guestdb' in config['DEFAULT']:
             pw_guestdb = config['DEFAULT']['pw_guestdb']
         else:
-            for pw_attempt in range(1, 8):
-                tk.Tk().withdraw()
-                pw_guestdb = tk.simpledialog.askstring("Password",
-                                                       "Please enter password "
-                                                       "(attempt {}/8):".format(pw_attempt),
-                                                       show='*')
+            if os.path.isfile(fn_guestdb):
+                for pw_attempt in range(1, 8):
+                    pw_guestdb = tk.simpledialog.askstring("Biometric Sign In Password",
+                                                           "Please enter the Biometric Sign In password "
+                                                           "(attempt {}/8):".format(pw_attempt),
+                                                           show='*')
 
+                    self.guestdb = database.db(password=pw_guestdb,
+                                               dbname=fn_guestdb)
+
+                    if self.guestdb.test_db_connection():
+                        break
+                    pw_attempt += 1
+            else:  # No DB exists, just need two successive PW entries
+                pw_guestdb = ""
+                pw_guestdb_prev = " "
+                while (pw_guestdb != pw_guestdb_prev) or len(pw_guestdb) < 8:
+                    pw_guestdb_prev = tk.simpledialog.askstring("Biometric Sign In Password",
+                                                                "Creating a new database for Biometric Sign In.\n"
+                                                                "Please enter a new password "
+                                                                "(at least 8 characters):",
+                                                                show='*')
+
+                    pw_guestdb = tk.simpledialog.askstring("Biometric Sign In Password",
+                                                           "Please re-enter the same password:",
+                                                           show='*')
+                    if pw_guestdb != pw_guestdb_prev:
+                        tk.messagebox.showinfo(title="Biometric Sign In passwords don't match",
+                                               message="Passwords don't match.\nPlease retry.")
+                    if len(pw_guestdb) < 8:
+                        tk.messagebox.showinfo(title="Biometric Sign In password too short",
+                                               message="Password is less than 8 characters.\nPlease retry.")
                 self.guestdb = database.db(password=pw_guestdb,
-                                           dbname=fn_guestdb)
-
-                if self.guestdb.test_db_connection():
-                    break
-                pw_attempt += 1
-
-        if not self.guestdb.test_db_connection():
-            tk.Tk().withdraw()
-            tk.messagebox.showinfo(title="Incorrect Password", message="Incorrect password, closing.")
-            exit(1)
+                                                 dbname=fn_guestdb)
 
         # Create db if it doesn't exist:
         if not os.path.isfile(fn_guestdb):
@@ -121,9 +141,13 @@ class Application:
             guest_meta = database.hmisv17_newguestdiag(unknown_guest,
                                              self.datadict_menu_rev)
             self.guestdb.add_guest(guest_meta)
+        else:  # Check db pw is correct before proceeding
+            if not self.guestdb.test_db_connection():
+                tk.messagebox.showinfo(title="Incorrect Biometric Sign In Password", message="Incorrect Biometric Sign In password, closing.")
+                exit(1)
 
-        # GUI Window initialization
-        self.root = tk.Tk()  # initialize root window
+        # Refocus on main window
+        self.root.deiconify()
         self.root.title("Biometric Sign In")  # set window title
 
         # self.destructor function gets fired when the window is closed
@@ -271,7 +295,7 @@ class Application:
 
             fc.pn_gstcap_out = os.path.join(self.pn_guest_images, gst_id)
 
-            # Reset SignIn Dataframe Initialization:
+            # Reset Sign In Dataframe Initialization:
             self.init_sign_in()
 
             # Capture new guest information
