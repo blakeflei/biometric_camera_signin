@@ -159,6 +159,10 @@ class db:
     # http://docs.sqlalchemy.org/en/latest/core/engines.html
     # Main DB Connection Ref Obj
     def __init__(self, dbtype='sqlite+pysqlcipher',  password='', dbname=''):
+        config = configparser.ConfigParser()
+        config.read(fn_config)
+        fn_datadict = config['DEFAULT']['fn_datadict']
+
         dbtype = dbtype.lower()
         self.db_engine = create_engine(
                 '{0}://:{1}@/{2}?'
@@ -168,9 +172,6 @@ class db:
         Session = sessionmaker(bind=self.db_engine)
         self.session = Session()
 
-        config = configparser.ConfigParser()
-        config.read(fn_config)
-        fn_datadict = config['DEFAULT']['fn_datadict']
         with open(fn_datadict) as f:
             self.datadict = json.load(f)
 
