@@ -1,10 +1,11 @@
 # Work with encrypted 7zip archives
 
+from subprocess import TimeoutExpired
 import subprocess
 import io
-import zipfile
 
 from PIL import Image
+from PIL import UnidentifiedImageError
 import numpy as np
 
 
@@ -15,8 +16,22 @@ class p7zip:
         self.zipfile = None
 
     def list_files(self):
-        self.zipfile = zipfile.ZipFile(self.fn_archive, 'r')
-        return self.zipfile.namelist()
+        """
+        List contents of an archive.
+        Parses 7zip output.
+        """
+        cmd_lst = ['7z', 'l']
+        if self.pw:
+            cmd_lst += ['-p' + self.pw]
+        cmd_lst += [self.fn_archive]
+        out = subprocess.run(cmd_lst,
+                             capture_output=True)
+        srch_str = b'------------------- ----- ------------ ------------  ------------------------'
+        start_ind = out.stdout.splitlines().index(srch_str) + 1
+        end_ind = out.stdout.splitlines()[start_ind+1:].index(srch_str) + 1
+        file_lines = out.stdout.splitlines()[start_ind:start_ind+end_ind]
+        files = [x.split()[-1].decode('utf-8') for x in file_lines]
+        return files
 
     def read_image(self, pn_img):
         """
@@ -24,16 +39,49 @@ class p7zip:
         compatible with OpenCV.
         Uses 7z directly as it's faster than zipfile and more reliable.
         """
-        print(self.fn_archive)
         cmd_lst = ['7z', 'x']
         if self.pw:
             cmd_lst += ['-p' + self.pw]
         cmd_lst += [self.fn_archive, '-so', pn_img]
-        print(cmd_lst)
-        out = subprocess.run(cmd_lst,
-                             capture_output=True)
-        image = Image.open(io.BytesIO(out.stdout))
+        try:
+            out = subprocess.run(cmd_lst,
+                                 timeout=10,
+                                 capture_output=True)
+        except TimeoutExpired:
+            print("[ERROR] Archive read timeout met. Is a password set?")
+            return None
+
+        try:
+            image = Image.open(io.BytesIO(out.stdout))
+        except UnidentifiedImageError:
+            print("[ERROR] Can't read image from archive. "
+                  "Is the correct archive password set?")
+            return None
+
         return np.array(image)
+
+    def add_image(self, image_array, path):
+        """
+        Stream OpenCV compatible numpy array image directly to archive.
+
+        7z archives are preferred - streaming input for 7z 16.02 is currently
+        only for xz, lzma, tar, gzip and bzip2 archives.
+        tar, xz, gzip, bzip2, lzma don't directly support compression.
+        """
+        image = Image.fromarray(image_array)
+        image_byte = io.BytesIO()
+        image.save(image_byte, format='PNG')
+        image_byte = image_byte.getvalue()
+
+        cmd_lst = ['7z', 'a']
+        if self.pw:
+            cmd_lst += ['-p' + self.pw]
+        cmd_lst += ['-si'+path, self.fn_archive]
+
+        out = subprocess.run(cmd_lst,
+                             input=image_byte,
+                             capture_output=True)
+        return out.stdout, out.stderr
 
     def add_file(self, pn_file):
         """
@@ -43,44 +91,10 @@ class p7zip:
         if not isinstance(pn_file, list):
             pn_file = [pn_file]
 
-        cmd_lst = ['7z', 'a']
+        cmd_lst = ['7z', 'a', self.fn_archive]
         if self.pw:
             cmd_lst += ['-p' + self.pw]
-        cmd_lst += [self.fn_archive]
         cmd_lst += pn_file
         out = subprocess.run(cmd_lst,
                              capture_output=True)
         return out.stdout, out.stderr
-
-
-#    def read_file(self, pn_file):
-#        self.zipfile = zipfile.ZipFile(self.fn_archive, 'r')
-#        if not self.pw:
-#            zip_file = self.zipfile.open(pn_file)
-#        else:
-#            zip_file = self.zipfile.open(pn_file, pwd=self.pw.encode('utf-8'))
-#        return zip_file
-
-
-#    def list_files(self):
-#        cmd_lst = ['7z', 'l']
-#        if self.pw:
-#            cmd_lst += ['-mem=AES256', '-p' + self.pw]
-#        cmd_lst += [self.fn_archive]
-#
-#        subp = subprocess.Popen(cmd_lst,
-#                                 stdin=PIPE,
-#                                 stdout=PIPE,
-#                                 stderr=PIPE)
-#        stdout, stderr = subp.communicate()
-#        srch_str = b'------------------- ----- ------------ ------------  ------------------------'
-#        start_ind = stdout.splitlines().index(srch_str) + 1
-#        end_ind = stdout.splitlines()[start_ind+1:].index(srch_str) + 1
-#        file_lines = stdout.splitlines()[start_ind:start_ind+end_ind]
-#        files = [x.split()[-1] for x in file_lines]
-#        return files
-
-
-#    def add_file(self,pn_archive):
-#        pass
-#
