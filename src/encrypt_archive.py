@@ -83,18 +83,38 @@ class p7zip:
                              capture_output=True)
         return out.stdout, out.stderr
 
-    def add_file(self, pn_file):
+    def add_file(self, fn_file):
         """
         Add a file to an encrypted archive.
         Requries 7z.
         """
-        if not isinstance(pn_file, list):
-            pn_file = [pn_file]
+        if not isinstance(fn_file, list):
+            fn_file = [fn_file]
 
         cmd_lst = ['7z', 'a', self.fn_archive]
         if self.pw:
             cmd_lst += ['-p' + self.pw]
-        cmd_lst += pn_file
+        cmd_lst += fn_file
         out = subprocess.run(cmd_lst,
                              capture_output=True)
         return out.stdout, out.stderr
+
+    def remove_folder(self, pn_folder):
+        """
+        Remove a folder from an encrypted archive.
+        Requres 7z.
+        """
+        if not isinstance(pn_folder, list):
+            pn_folder = [pn_folder]
+
+        cmd_lst = ['7z', 'd', self.fn_archive]
+        if self.pw:
+            cmd_lst += ['-p' + self.pw]
+        cmd_lst += ['-r'] + pn_folder
+        out = subprocess.run(cmd_lst,
+                             capture_output=True)
+        return out.stdout, out.stderr
+
+
+
+
