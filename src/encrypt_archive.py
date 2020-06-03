@@ -60,7 +60,7 @@ class p7zip:
 
         return np.array(image)
 
-    def add_image(self, image_array, path):
+    def add_image(self, path, image_array):
         """
         Stream OpenCV compatible numpy array image directly to archive.
 
