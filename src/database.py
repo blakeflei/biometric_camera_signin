@@ -20,7 +20,9 @@ fn_config = 'biometric.cfg'
 
 
 class SignLog(Base):
-    """Sqlalchemy ORM table for individuals who have signed in."""
+    """
+    Sqlalchemy ORM table for individuals who have signed in.
+    """
     __tablename__ = 'signin'
 
     id = Column(Integer, primary_key=True)
@@ -31,7 +33,9 @@ class SignLog(Base):
 
 
 class SignSS(Base):
-    """Sqlalchemy ORM table for sign in starts and stops."""
+    """
+    Sqlalchemy ORM table for sign in starts and stops.
+    """
     __tablename__ = 'startstop'
 
     start_time = Column(DateTime, primary_key=True)
@@ -39,7 +43,9 @@ class SignSS(Base):
 
 
 class Clients(Base):
-    """Create sqlalchemy orm table for guests."""
+    """
+    Create sqlalchemy orm table for guests.
+    """
     __tablename__ = 'clients'
 
     personal_id = Column(Integer, primary_key=True)
@@ -82,6 +88,10 @@ class Clients(Base):
 
 
 def hmisv17_newguestdiag(guest_meta, datadict_menu_rev):
+    """
+    Translate guest metadata from the new guest dialog into
+    hmis2020 v1.7 format for storage into a compilant db.
+    """
     if 'dob' in guest_meta.keys() and isinstance(guest_meta['dob'], str):
         # Convert dob into a datetime.date obj
         # if full dob reported:
@@ -157,8 +167,11 @@ def hmisv17_newguestdiag(guest_meta, datadict_menu_rev):
 
 
 class db:
-    # http://docs.sqlalchemy.org/en/latest/core/engines.html
-    # Main DB Connection Ref Obj
+    """
+    Database object for db operations.
+    References:
+    http://docs.sqlalchemy.org/en/latest/core/engines.html
+    """
     def __init__(self, dbtype='sqlite+pysqlcipher',  password='', dbname=''):
         config = configparser.ConfigParser()
         config.read(fn_config)
