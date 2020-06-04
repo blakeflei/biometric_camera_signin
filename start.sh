@@ -6,6 +6,8 @@
 # Assumes the desired camera id is 0 and the display is 0 (defaults).
 
 docker run \
+	--interactive \
+	--tty \
 	--rm \
 	--env DISPLAY=:0.0 \
 	--env TZ=$(cat /etc/timezone) \
