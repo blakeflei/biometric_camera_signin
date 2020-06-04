@@ -93,16 +93,35 @@ def hmisv17_newguestdiag(guest_meta, datadict_menu_rev):
     hmis2020 v1.7 format for storage into a compilant db.
     """
     if 'dob' in guest_meta.keys() and isinstance(guest_meta['dob'], str):
-        # Convert dob into a datetime.date obj
-        # if full dob reported:
-        guest_meta['dob'] = datetime.datetime.strptime(guest_meta['dob'], '%m/%d/%Y').date()
-        guest_meta['dob_data_quality'] = 1
-        ## if Approx or partial
-        #guest_meta['dob_data_quality'] = 2
-        ## if client doesn't know
-        #guest_meta['dob_data_quality'] = 8
-        ## if client refused
-        #guest_meta['dob_data_quality'] = 9
+        import pdb
+        pdb.set_trace()
+        if 'refuse' in guest_meta['dob']:
+            guest_meta['dob'] = None
+            guest_meta['dob_data_quality'] = 9
+        elif 'not know' in guest_meta['dob']:
+            guest_meta['dob'] = None
+            guest_meta['dob_data_quality'] = 8
+        elif guest_meta['dob'].count('/') == 1:
+            try:
+                guest_meta['dob'] = datetime.datetime.strptime(guest_meta['dob'], '%m/%Y').date()
+                guest_meta['dob_data_quality'] = 2
+            except ValueError:
+                print("[ERROR] entered date {} isn't in format 'mm/yyyy', not stored!"
+                      .format(guest_meta['dob']))
+                guest_meta['dob'] = None
+                guest_meta['dob_data_quality'] = 99
+        elif guest_meta['dob'].count('/') == 2:
+            try:
+                guest_meta['dob'] = datetime.datetime.strptime(guest_meta['dob'], '%m/%d/%Y').date()
+                guest_meta['dob_data_quality'] = 1
+            except ValueError:
+                print("[ERROR] entered date {} isn't in format 'mm/dd/yyyy', not stored!"
+                      .format(guest_meta['dob']))
+                guest_meta['dob'] = None
+                guest_meta['dob_data_quality'] = 99
+        else:
+            guest_meta['dob'] = None
+            guest_meta['dob_data_quality'] = 99
 
     if 'race' in guest_meta.keys():
         guest_meta['am_ind_ak_native'] = 0

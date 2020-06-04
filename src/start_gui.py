@@ -18,7 +18,6 @@ import tkinter as tk
 import uuid
 
 from PIL import ImageTk
-from tkcalendar import DateEntry
 import pandas as pd
 
 from camera import FacialCamera as FC
@@ -565,11 +564,7 @@ class NewGuestDialog(simpledialog.Dialog):
         self.e1 = tk.Entry(master)
         self.e2 = tk.Entry(master)
         self.e3 = tk.Entry(master)
-        self.e4 = DateEntry(master,
-                            bg='darkblue',
-                            date_pattern='mm/dd/y',
-                            fg='white',
-                            year=1970)
+        self.e4 = tk.Entry(master)
         self.e5 = tk.StringVar(master)
         self.e5.set(opt_race[0])
         self.e6 = tk.StringVar(master)
@@ -642,6 +637,22 @@ class NewGuestDialog(simpledialog.Dialog):
             tk.messagebox.showwarning(
                 "First Name Needed",
                 "First Name is mandatory. Please enter a first name.",
+                parent=self
+            )
+            return 0
+
+        mdy_pattern = re.compile(r"^\d{2}\/\d{2}/\d{4}$")
+        my_pattern = re.compile(r"^\d{2}\/\d{4}$")
+        if not any([result['dob'] == 'refuse' or
+                   result['dob'] == 'not know' or
+                   mdy_pattern.match(result['dob']) or
+                   my_pattern.match(result['dob'])]):
+            tk.messagebox.showwarning(
+                "Invalid Date of Birth",
+                "Please enter date of birth as either "
+                "'mm/dd/yyyy' or 'mm/yyyy'.\n"
+                "If guest doesn't know, enter 'not know'.\n"
+                "If guest refused, enter 'refuse'.",
                 parent=self
             )
             return 0
