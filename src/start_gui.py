@@ -43,9 +43,11 @@ fc = FC()
 
 class Application:
     def __init__(self, pn_output="./"):
-        """ Initialize application which uses OpenCV + Tkinter. It displays
-            a video stream in a Tkinter window and stores current snapshot on
-            disk."""
+        """
+        Initialize application which uses OpenCV + Tkinter. It displays
+        a video stream in a Tkinter window and stores current snapshot on
+        disk.
+        """
 
         self.pic_num = 0
         self.pn_gstcap_out = None
@@ -240,7 +242,9 @@ class Application:
         self.video_loop()
 
     def video_loop(self):
-        """ Get frame from the video stream and show it in Tkinter """
+        """
+        Get frame from the video stream and show it in Tkinter.
+        """
         curr_pic, orig_pic = fc.query_camera()
 
         if curr_pic is not None:
@@ -340,8 +344,10 @@ class Application:
             self.update_signin()
 
     def init_sign_in(self):
-        """Initialize the sign in dataframe using columns from the SignLog
-        table."""
+        """
+        Initialize the sign in dataframe using columns from the SignLog
+        table.
+        """
         self.sign_in = pd.DataFrame(columns=SignLog.__table__.columns.keys()[1:])
         self.sign_in_saved = self.sign_in.copy()
 
@@ -349,7 +355,8 @@ class Application:
                                          [None for x in SignSS.__table__.columns.keys()]))
 
     def update_signin(self):
-        """Update database with those who have signed in.
+        """
+        Update database with those who have signed in.
         """
         new_fr_id = (set(self.sign_in['fr_id'])
                      - set(self.sign_in_saved['fr_id']))
@@ -365,7 +372,7 @@ class Application:
 
     def guest_identify_init(self):
         """
-        Identify individuals
+        Identify guests previously captured.
         """
         b_identify_idx_dict = {gst_identify_off_txt: gst_identify_on_txt,
                                gst_identify_on_txt: gst_identify_off_txt}
@@ -465,7 +472,8 @@ class Application:
         self.b_encode['text'] = gst_embed_train_off_txt
 
     def init_meal_log(self):
-        """Output meal log.
+        """
+        Output meal log.
         """
         ExportMealLogDialog(self.root,
                             title='Export Meal Log',
@@ -473,7 +481,9 @@ class Application:
                             guestdb=self.guestdb)
 
     def destructor(self):
-        """ Destroy the root object and release all resources """
+        """
+        Destroy the root object and release all resources.
+        """
         print("[INFO] closing...")
         clear_db_history()
         self.root.destroy()
@@ -481,7 +491,8 @@ class Application:
 
 
 def flip_dict(data_dict):
-    """Return a dictionary with the keys and values exchanged.
+    """
+    Return a dictionary with the keys and values exchanged.
     """
     data_dict_out = copy.deepcopy(data_dict)
     for key in data_dict_out.keys():
@@ -491,7 +502,8 @@ def flip_dict(data_dict):
 
 
 def dict_dropdown(data_dict):
-    """Update dictionary keys to be more guest readable for dropdown menus.
+    """
+    Update dictionary keys to be more guest readable for dropdown menus.
     """
     data_dict_out = copy.deepcopy(data_dict)
     for key in data_dict_out.keys():
@@ -502,7 +514,8 @@ def dict_dropdown(data_dict):
 
 
 def simplify_dropdown(datadict_item):
-    """Pair items from the data dictionary to be appropriate values for gui drop
+    """
+    Pair items from the data dictionary to be appropriate values for gui drop
     down lists.
     """
     opt_list = list(datadict_item['data'].keys())
@@ -515,7 +528,9 @@ def simplify_dropdown(datadict_item):
 
 
 class NewGuestDialog(simpledialog.Dialog):
-    """Define a pop up window that collects new guest information."""
+    """
+    Define a pop up window that collects new guest information.
+    """
     def __init__(self, *args, datadict, **kwargs):
         self.datadict = datadict
         super().__init__(*args, **kwargs)
@@ -668,7 +683,9 @@ class NewGuestDialog(simpledialog.Dialog):
 
 
 class ExportMealLogDialog(simpledialog.Dialog):
-    """Define a pop up window that collects new guest information."""
+    """
+    Define a pop up window that collects new guest information.
+    """
     def __init__(self, *args, guestdb, fn_meal_log_default, **kwargs):
         self.guestdb = guestdb
         self.df_startstop = guestdb.query_startstop()
@@ -823,7 +840,9 @@ class ExportMealLogDialog(simpledialog.Dialog):
 
 
 def clear_db_history():
-    """Clear database history (secure pw and user info)"""
+    """
+    Clear database history (secure pw and user info).
+    """
     filename = str(Path.joinpath(Path.home(), '.sqlite_history'))
     try:
         os.remove(filename)

@@ -16,9 +16,11 @@ fn_config = 'biometric.cfg'
 
 class FacialCamera:
     def __init__(self, pn_output="./"):
-        """ Initialize application which uses OpenCV + Tkinter. It displays
-            a video stream in a Tkinter window and stores current snapshot on
-            disk. """
+        """
+        Initialize application which uses OpenCV + Tkinter. It displays
+        a video stream in a Tkinter window and stores current snapshot on
+        disk.
+        """
         # Initialize the video stream, then allow the camera sensor to warm up
         print("[INFO] starting video stream...")
         self.vs = cv2.VideoCapture(0)  # Capture video frames, 0 is default video camera
@@ -285,5 +287,7 @@ class FacialCamera:
         return pic_display  # Show the output frame
 
     def destructor(self):
-        """ Destroy the root object and release all resources """
+        """
+        Destroy the root object and release all resources.
+        """
         cv2.destroyAllWindows()
