@@ -11,7 +11,7 @@ biometric_dir = '/home/biom/biometric_camera_signin/'
 config['DEFAULT'] = {}
 
 # System PW:
-#config['DEFAULT']['pw_guestdb'] = 'ChangEmEPleasE'  # Comment to force manual entry
+#config['DEFAULT']['pw_guestdb'] = 'ChangEmEPleasE'  # Uncomment to enable automatic entry
 
 # Camera Settings
 config['DEFAULT']['camera_rot'] = '90'

@@ -25,7 +25,6 @@ from camera import FacialCamera as FC
 from database import SignLog
 from database import SignSS
 from embeddings_train import ModelTrain as mt
-from encrypt_archive import p7zip
 import database
 
 # Basic variables
@@ -133,16 +132,16 @@ class Application:
                   .format(fn_guestdb))
             self.guestdb.create_db_tables()
 
-            unknown_guest = {'first_name':'Unknown',
-                             'middle_name':'Unknown',
-                             'last_name':'Unknown',
-                             'dob':'01/01/1900',
-                             'race':'Guest refused',
-                             'ethnicity':'Guest refused',
-                             'gender':'Guest refused',
-                             'fr_id':self.unknown_guest_id}
+            unknown_guest = {'first_name': 'Unknown',
+                             'middle_name': 'Unknown',
+                             'last_name': 'Unknown',
+                             'dob': '01/01/1900',
+                             'race': 'Guest refused',
+                             'ethnicity': 'Guest refused',
+                             'gender': 'Guest refused',
+                             'fr_id': self.unknown_guest_id}
             guest_meta = database.hmisv17_newguestdiag(unknown_guest,
-                                             self.datadict_menu_rev)
+                                                       self.datadict_menu_rev)
             self.guestdb.add_guest(guest_meta)
         else:  # Check db pw is correct before proceeding
             if not self.guestdb.test_db_connection():

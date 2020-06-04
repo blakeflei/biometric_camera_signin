@@ -33,7 +33,7 @@ class FacialCamera:
         self.image_width = int(config['DEFAULT']['image_width'])
         self.max_capture_interval = float(config['DEFAULT']['capture_interval'])
         self.max_capture_length = int(config['DEFAULT']['max_capture_length'])
-        self.max_images = int(config['DEFAULT']['max_images']) 
+        self.max_images = int(config['DEFAULT']['max_images'])
 
         # Capture Vars
         self.curr_pic = None  # Current image from the camera

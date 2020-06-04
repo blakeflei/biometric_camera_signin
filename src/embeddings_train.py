@@ -4,7 +4,6 @@ import configparser
 import os
 import pickle
 
-from imutils import paths
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import SVC

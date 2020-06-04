@@ -114,7 +114,3 @@ class p7zip:
         out = subprocess.run(cmd_lst,
                              capture_output=True)
         return out.stdout, out.stderr
-
-
-
-
