@@ -12,6 +12,8 @@ import cv2
 import imutils
 import numpy as np
 
+from encrypt_archive import p7zip
+
 fn_config = 'biometric.cfg'
 
 
@@ -23,7 +25,8 @@ class ModelTrain:
         # Load config
         config = configparser.ConfigParser()
         config.read(fn_config)
-        self.pn_guest_images = config['DEFAULT']['pn_guest_images']
+        self.pn_guest_images = config['DEFAULT']['pn_guest_images_archive']
+        self.guest_archive = p7zip(self.pn_guest_images)
         self.image_width = int(config['DEFAULT']['image_width'])
 
         # External pre-trained models
@@ -60,8 +63,10 @@ class ModelTrain:
 
         # Determine image paths to the input images
         print("[INFO] Quantifying faces...")
-        image_paths = list(paths.list_images(self.pn_guest_images))
-
+        image_paths = self.guest_archive.list_files()
+        image_ext = ['.jpg', '.jpeg', '.png']
+        image_paths = [x for x in image_paths if
+                       any([ext in x for ext in image_ext])]
         # Init extracted facial embeddings and
         # corresponding guest_ids
         guest_embeddings = []
@@ -75,8 +80,8 @@ class ModelTrain:
         for (i, image_path) in enumerate(image_paths):
             print("[INFO] Processing image {}/{}".format(i + 1,
                                                          len(image_paths)))
-            guest_id = os.path.basename(os.path.dirname(image_path))
-            image = cv2.imread(image_path)
+            guest_id = os.path.dirname(image_path)
+            image = self.guest_archive.read_image(image_path)
             try:
                 image = imutils.resize(image, width=600)
             except Exception as e:

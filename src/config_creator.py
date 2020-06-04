@@ -11,12 +11,12 @@ biometric_dir = '/home/biom/biometric_camera_signin/'
 config['DEFAULT'] = {}
 
 # System PW:
-config['DEFAULT']['pw_guestdb'] = 'ChangEmEPleasE'
+#config['DEFAULT']['pw_guestdb'] = 'ChangEmEPleasE'  # Comment to force manual entry
 
 # Camera Settings
 config['DEFAULT']['camera_rot'] = '90'
 config['DEFAULT']['capture_interval'] = '0.5'
-config['DEFAULT']['max_capture_length'] = '50'  # Max capture guest seconds
+config['DEFAULT']['max_capture_length'] = '120'  # Max capture guest seconds
 config['DEFAULT']['max_images'] = '60'  # Max capture guest images?
 config['DEFAULT']['image_width'] = '600'
 
@@ -39,9 +39,9 @@ config['DEFAULT']['fn_guestdb'] = os.path.join(biometric_dir,
 config['DEFAULT']['fn_datadict'] = os.path.join(biometric_dir,
                                                 'data',
                                                 'data_dict.json')
-config['DEFAULT']['pn_guest_images'] = os.path.join(biometric_dir,
-                                                    'data',
-                                                    'guest_images')
+config['DEFAULT']['pn_guest_images_archive'] = os.path.join(biometric_dir,
+                                                            'data',
+                                                            'guest_images.7z')
 
 # Pretrained OpenCV caffe model for localizing faces
 # Build instructions are here:

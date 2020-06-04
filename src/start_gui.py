@@ -25,6 +25,7 @@ from camera import FacialCamera as FC
 from database import SignLog
 from database import SignSS
 from embeddings_train import ModelTrain as mt
+from encrypt_archive import p7zip
 import database
 
 # Basic variables
@@ -53,14 +54,14 @@ class Application:
         # Load config
         config = configparser.ConfigParser()
         config.read(fn_config)
-        self.pn_guest_images = config['DEFAULT']['pn_guest_images']
+        self.pn_guest_images = config['DEFAULT']['pn_guest_images_archive']
         self.image_width = int(config['DEFAULT']['image_width'])
         self.display_name = config['DEFAULT']['display_name']
         self.fn_label_encoder = config['DEFAULT']['fn_label_encoder']
         self.fn_recognizer_model = config['DEFAULT']['fn_recognizer_model']
-
         self.fn_meal_log_default = config['DEFAULT']['fn_meal_log_default']
         os.makedirs(os.path.dirname(self.fn_meal_log_default), exist_ok=True)
+        self.unknown_guest_id = '00000000-0000-0000-0000-000000000000'
 
         # Read in data dict:
         fn_datadict = config['DEFAULT']['fn_datadict']
@@ -81,10 +82,9 @@ class Application:
         self.root = tk.Tk()  # initialize root window
         self.root.withdraw()
 
-        # Initialize DB, collect password if not specified
+        # Collect password if not specified in config
         clear_db_history()
         fn_guestdb = config['DEFAULT']['fn_guestdb']
-
         if 'pw_guestdb' in config['DEFAULT']:
             pw_guestdb = config['DEFAULT']['pw_guestdb']
         else:
@@ -101,7 +101,7 @@ class Application:
                     if self.guestdb.test_db_connection():
                         break
                     pw_attempt += 1
-            else:  # No DB exists, just need two successive PW entries
+            else:  # No db exists, just need two successive PW entries
                 pw_guestdb = ""
                 pw_guestdb_prev = " "
                 while (pw_guestdb != pw_guestdb_prev) or len(pw_guestdb) < 8:
@@ -121,17 +121,18 @@ class Application:
                         tk.messagebox.showinfo(title="Biometric Sign In password too short",
                                                message="Password is less than 8 characters.\nPlease retry.")
                 self.guestdb = database.db(password=pw_guestdb,
-                                                 dbname=fn_guestdb)
+                                           dbname=fn_guestdb)
+
+        # Guestdb password is used for guest images archive as well
+        self.pw_guestdb = pw_guestdb
+        fc.guest_archive.pw = self.pw_guestdb
 
         # Create db if it doesn't exist:
         if not os.path.isfile(fn_guestdb):
             print('[INFO] No prior {} database found, re-initializing.'
                   .format(fn_guestdb))
             self.guestdb.create_db_tables()
-            # Create unknown entry and folder:
-            os.makedirs(os.path.join(self.pn_guest_images,
-                                     '00000000-0000-0000-0000-000000000000'),
-                        exist_ok=True)
+
             unknown_guest = {'first_name':'Unknown',
                              'middle_name':'Unknown',
                              'last_name':'Unknown',
@@ -139,14 +140,37 @@ class Application:
                              'race':'Guest refused',
                              'ethnicity':'Guest refused',
                              'gender':'Guest refused',
-                             'fr_id':'00000000-0000-0000-0000-000000000000'}
+                             'fr_id':self.unknown_guest_id}
             guest_meta = database.hmisv17_newguestdiag(unknown_guest,
                                              self.datadict_menu_rev)
             self.guestdb.add_guest(guest_meta)
         else:  # Check db pw is correct before proceeding
             if not self.guestdb.test_db_connection():
                 tk.messagebox.showinfo(title="Incorrect Biometric Sign In Password", message="Incorrect Biometric Sign In password, closing.")
+                self.destructor
                 exit(1)
+
+        # Create guest_images archive if it doesn't exist:
+        if not os.path.isfile(fc.guest_archive.fn_archive):
+            unknown_guest_img_path = tk.filedialog.askdirectory(parent=self.root,
+                                                                initialdir=os.getcwd(),
+                                                                title='Please select a directory for unknown guest images.')
+            pns_unknown_guest_img = glob.glob(os.path.join(unknown_guest_img_path,
+                                                           '*'))
+            # Create a temp directory for unknown guest images so the
+            # archive is structured correctly:
+            print('[INFO] Creating {} and storing unknown guest faces...'
+                  .format(fc.guest_archive.fn_archive))
+            os.makedirs(self.unknown_guest_id,
+                        exist_ok=True)
+            [shutil.copy(x, os.path.join(self.unknown_guest_id,
+                                         os.path.basename(x))) for x in pns_unknown_guest_img]
+            pns_unknown_guest_img_copy = glob.glob(os.path.join(self.unknown_guest_id,
+                                                                '*'))
+            fc.guest_archive.add_file(pns_unknown_guest_img_copy)
+            shutil.rmtree(os.path.join(unknown_guest_img_path,
+                                       self.unknown_guest_id),
+                          ignore_errors=True)
 
         # Refocus on main window
         self.root.deiconify()
@@ -156,21 +180,14 @@ class Application:
         self.root.protocol('WM_DELETE_WINDOW', self.destructor)
 
         # Check for faces in unknown folder
-        file_exts = ['*.png', '*.jpg', '*.jpeg']
-        fns_unknown_guest = []
-        for curr_file_ext in file_exts:
-            fns_unknown_guest.extend(
-                glob.glob(os.path.join(self.pn_guest_images,
-                                       '00000000-0000-0000-0000-000000000000',
-                                       curr_file_ext)))
+        fns_unknown_guest = fc.guest_archive.list_files()
+        fns_unknown_guest = [x for x in fns_unknown_guest
+                             if os.path.dirname(x) == self.unknown_guest_id]
         if not fns_unknown_guest:
             tk.messagebox.showwarning(
                 "No Unknown Images",
-                "No unknown images located in\n"
-                "{}\n"
-                "Please add images of non-guest faces there."
-                .format(os.path.join(self.pn_guest_images,
-                                     '00000000-0000-0000-0000-000000000000')),
+                "No images of unknown faces.\n"
+                "Please restart and select a folder of unknown guest faces.",
                 parent=self.root)
 
         # Set up GUI canvas and panel
@@ -236,8 +253,7 @@ class Application:
                 # Append new guest ids:
                 self.guest_ids = fc.guest_ids
                 # Drop 'unknown' guest id:
-                unknown_guest_id = '00000000-0000-0000-0000-000000000000'
-                self.guest_ids.pop(unknown_guest_id, None)
+                self.guest_ids.pop(self.unknown_guest_id, None)
                 # Drop users already signed in:
                 if not self.sign_in.empty:
                     for curr_id in self.sign_in['fr_id']:
@@ -295,7 +311,7 @@ class Application:
             fc.pic_num = 0
             fc.capture_time_prev = time.time()
 
-            fc.pn_gstcap_out = os.path.join(self.pn_guest_images, gst_id)
+            fc.pn_gstcap_out = gst_id
 
             # Reset Sign In Dataframe Initialization:
             self.init_sign_in()
@@ -417,14 +433,32 @@ class Application:
                   .format(len(del_folders)))
             [shutil.rmtree(pn) for pn in del_folders]
 
+    def remove_guestcapture_notindb_archive(self):
+        """
+        Remove folders for users that don't have entries in the db.
+        Users are effectively anonymous.
+        """
+        db_guest_ids = self.guestdb.query_allguestmeta().index
+        id_folders = [os.path.dirname(x) for x in
+                      fc.guest_archive.list_files()]
+        id_folders = [x for x in id_folders if x not in ['']]
+
+        del_folders = set(id_folders) - set(db_guest_ids)
+        if del_folders:
+            print('[INFO] removing {} capture folder(s) that don\'t correspond '
+                  'to guests captured in the "clients" db table.'
+                  .format(len(del_folders)))
+            [fc.guest_archive.remove_folder(pn) for pn in del_folders]
+
     def embed_train_init(self):
         """
         Obtain image embeddings and train model.
         """
         print('[INFO] Checking for guests not in db...')
-        self.remove_guestcapture_notindb()
+        self.remove_guestcapture_notindb_archive()
         print('[INFO] Running image embeddings...')
         embed_train = mt()
+        embed_train.guest_archive.pw = self.pw_guestdb
         embed_train.extract_embeddings()
         print('[INFO] Training SVM model over embeddings...')
         embed_train.train_model()

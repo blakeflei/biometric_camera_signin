@@ -9,6 +9,8 @@ import cv2
 import imutils
 import numpy as np
 
+from encrypt_archive import p7zip
+
 fn_config = 'biometric.cfg'
 
 
@@ -25,12 +27,13 @@ class FacialCamera:
         # Load config
         config = configparser.ConfigParser()
         config.read(fn_config)
-        self.pn_guest_images = config['DEFAULT']['pn_guest_images']
+        self.pn_guest_images = config['DEFAULT']['pn_guest_images_archive']
+        self.guest_archive = p7zip(self.pn_guest_images)
         self.camera_rot = int(config['DEFAULT']['camera_rot'])
         self.image_width = int(config['DEFAULT']['image_width'])
         self.max_capture_interval = float(config['DEFAULT']['capture_interval'])
         self.max_capture_length = int(config['DEFAULT']['max_capture_length'])
-        self.max_images = int(config['DEFAULT']['max_images'])
+        self.max_images = int(config['DEFAULT']['max_images']) 
 
         # Capture Vars
         self.curr_pic = None  # Current image from the camera
@@ -91,7 +94,14 @@ class FacialCamera:
             print("[INFO] Directory \"{}\" does not exist, creating..."
                   .format(path_dir))
             os.makedirs(path_dir)
+
         cv2.imwrite(path_pic, pic)
+
+    def save_pic_archive(self, path_pic, pic):
+        """
+        Save image to archive on disk.
+        """
+        self.guest_archive.add_image(path_pic, pic)
 
     def guest_capture_func(self, pic_save, pic_display):
         """
@@ -139,7 +149,7 @@ class FacialCamera:
             # Capture image and save to file
             pn_pic = os.path.sep.join([self.pn_gstcap_out, "{}.png".format(
                 str(self.pic_num).zfill(5))])
-            self.save_pic(pn_pic, pic_save)
+            self.save_pic_archive(pn_pic, pic_save)
             self.pic_num += 1
             self.capture_time_prev = capture_time_curr
             print("[INFO] Saved image {}.".format(self.pic_num))
