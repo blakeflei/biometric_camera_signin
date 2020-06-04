@@ -18,5 +18,5 @@ docker run \
 	--net=host \
 	--workdir /home/biom/biometric_camera_signin/src \
 	--name biometric_signin \
-	blakeflei/arm32v7-biometric:20200508 \
+	blakeflei/arm32v7-biometric:20200604 \
 	python start_gui.py

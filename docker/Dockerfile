@@ -112,6 +112,7 @@ RUN apt-get update && \
   apt-get install -y --no-install-recommends \
   gosu \
   libkeyutils1 \
+  p7zip-full \
   tcl \
   tk \
   tmux \
