@@ -93,8 +93,6 @@ def hmisv17_newguestdiag(guest_meta, datadict_menu_rev):
     hmis2020 v1.7 format for storage into a compilant db.
     """
     if 'dob' in guest_meta.keys() and isinstance(guest_meta['dob'], str):
-        import pdb
-        pdb.set_trace()
         if 'refuse' in guest_meta['dob']:
             guest_meta['dob'] = None
             guest_meta['dob_data_quality'] = 9
