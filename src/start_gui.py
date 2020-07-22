@@ -770,12 +770,12 @@ class ExportMealLogDialog(simpledialog.Dialog):
 
     def cleanresult(self):
         result = self.getresult()
-        if result['start_date_drp'] == 'Select':
+        if result['start_date_txt'] != '':
             start_date = result['start_date_txt']
         else:
             start_date = result['start_date_drp']
 
-        if result['stop_date_drp'] == 'Select':
+        if result['stop_date_txt'] != '':
             stop_date = result['stop_date_txt']
         else:
             stop_date = result['stop_date_drp']
