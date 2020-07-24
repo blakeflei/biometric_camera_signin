@@ -142,10 +142,10 @@ def hmisv17_newguestdiag(guest_meta, datadict_menu_rev):
         if guest_meta['race'] == "White":
             guest_meta['white'] = 1
 
-        if guest_meta['race'] == "Doesn't know":
+        if guest_meta['race'] == "Guest doesn't know":
             guest_meta['race_none'] = 8
 
-        if guest_meta['race'] == 'Refused':
+        if guest_meta['race'] == 'Guest refused':
             guest_meta['race_none'] = 9
 
         del guest_meta['race']
@@ -234,6 +234,19 @@ class db:
         nonzero_cols = df.apply(lambda x: list(df.columns[x.values]), axis=1)
         return nonzero_cols.apply(lambda x: x[0] if len(x) == 1 else x)
 
+    def determine_race(self, df_race, df_race_none):
+        """
+        Determine race for a given individual given
+        race columns and data quality column are separate.
+        """
+        # Return nonzero races:
+        race = self.nonzerocols(df_race.astype(bool))
+        # replace all empyt lists with race_none values, if any:
+        none_indexes = race.apply(lambda x: isinstance(x, list) and len(x)==0)
+        if none_indexes.any():
+            race[none_indexes] = df_race_none.loc[none_indexes].apply(lambda x: self.datadict['1.6']['data'][str(x)])
+        return race
+
     def query_allguestmeta(self):
         df_allguestmeta = pd.read_sql_table('clients', con=self.db_engine)
         df_allguestmeta.set_index('fr_id', inplace=True)
@@ -243,11 +256,12 @@ class db:
                                                      + df_allguestmeta['middle_name']
                                                      + ' '
                                                      + df_allguestmeta['last_name'],
-                                                     'Race': self.nonzerocols(df_allguestmeta[['am_ind_ak_native',
-                                                                                               'asian',
-                                                                                               'black_af_american',
-                                                                                               'native_hi_other_pacific',
-                                                                                               'white']].astype(bool)),
+                                                     'Race': self.determine_race(df_allguestmeta[['am_ind_ak_native',
+                                                                                                  'asian',
+                                                                                                  'black_af_american',
+                                                                                                  'native_hi_other_pacific',
+                                                                                                  'white']],
+                                                                                 df_allguestmeta['race_none']),
                                                      'Ethnicity': df_allguestmeta['ethnicity'].apply(lambda x: self.datadict['3.05.1']['data'][str(x)]),
                                                      'DOB': df_allguestmeta['dob'],
                                                      'Gender': df_allguestmeta['gender'].apply(lambda x: self.datadict['3.06.1']['data'][str(x)]),
@@ -285,11 +299,12 @@ class db:
                                    + df_signlog['middle_name']
                                    + ' '
                                    + df_signlog['last_name'],
-                                   'Race': self.nonzerocols(df_signlog[['am_ind_ak_native',
-                                                                        'asian',
-                                                                        'black_af_american',
-                                                                        'native_hi_other_pacific',
-                                                                        'white']].astype(bool)),
+                                   'Race': self.determine_race(df_signlog[['am_ind_ak_native',
+                                                                                'asian',
+                                                                                'black_af_american',
+                                                                                'native_hi_other_pacific',
+                                                                                'white']],
+                                                               df_signlog['race_none']),
                                    'Ethnicity': df_signlog['ethnicity'].apply(lambda x: self.datadict['3.05.1']['data'][str(x)]),
                                    'DOB': df_signlog['dob'],
                                    'Gender': df_signlog['gender'].apply(lambda x: self.datadict['3.06.1']['data'][str(x)]),
