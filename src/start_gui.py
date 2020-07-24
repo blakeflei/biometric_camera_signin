@@ -854,7 +854,7 @@ def clear_db_history():
     """
     Clear database history (secure pw and user info).
     """
-    filename = str(Path.joinpath(Path.home(), '.sqlite_history'))
+    filename = str(Path.home().joinpath('.sqlite_history'))
     try:
         os.remove(filename)
     except OSError:
